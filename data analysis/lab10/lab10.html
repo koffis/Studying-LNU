@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+
+    <script>
+        var iter = 0;
+
+        function f(x) {
+            return x * Math.exp(x) + x * x;
+        }
+
+        var a = -1;
+        var b = 0.2;
+        var eps = 1e-5;
+        var step = (b - a) / 50;
+
+        function draw() {
+            var dataArray = [];
+            for (var i = a; i < b; i += step) {
+                dataArray.push({
+                    x: i,
+                    y: f(i)
+                })
+            }
+            return dataArray;
+        }
+        console.log(draw());
+
+
+        function solve() {
+            a = -1;
+            b = 0.2;
+            eps = 1e-5;
+            step = (b - a) / 50;
+
+            var x = Bisection(a, b, eps);
+            var point1 = ({
+                x: x,
+                y: f(x),
+                color: '#ff0000'
+            });
+
+            console.log(point1);
+            console.log("Bisection: X =, Y = ,  iterations", x, f(x), iter);
+
+            x = RandomSearch(a, b);
+            var point2 = ({
+                x: x,
+                y: f(x),
+                color: '#9932a8'
+            });
+            console.log("Random Search: X =, Y =,  iterations\n", x, f(x), iter);
+
+            x = Gradient_Method(eps);
+            var point3 = ({
+                x: x,
+                y: f(x),
+                
+                color: '#b7ff00'
+            });
+            console.log("Gradient: X =, Y =,  iterations", x, f(x), iter);
+
+            return [point1, point2, point3];
+        }
+
+
+        function Bisection(a, b, eps) {
+            var p = 0;
+            var q = 0;
+            var d = 0.0001;
+            iter = 0;
+
+            while (Math.abs(b - a) > d) {
+                p = (a + b) / 2.0 + eps;
+
+                q = (a + b) / 2.0 - eps;
+
+                if (f(p) < f(q)) {
+                    a = q;
+                } else {
+                    b = p;
+                }
+
+                iter++;
+            }
+
+            return (a + b) / 2.0;
+        }
+
+        function RandomSearch(a, b) {
+            var N = 10;
+            var min = 99999.0
+            var minx = 0.0;
+            var x = [];
+            var y = [];
+            iter = 0;
+
+            for (var i = 0; i < N; i++) {
+                x.push(Math.random() * (b - a) + a);
+            }
+
+            for (var i = 0; i < N; i++) {
+                y.push(f(x[i]));
+
+                if (min > y[i]) {
+                    min = y[i];
+                    minx = x[i];
+                }
+
+                iter++;
+            }
+            console.log(y);
+            return minx;
+        }
+
+        function Gradient_Method(eps) {
+
+            var d = 0.00001;
+            var h = 0.1
+            var x0 = -0.7;
+            var x = 0.0,
+                g;
+            var i;
+            var i1;
+
+            iter = 0;
+            while (true) {
+                g = (f(x0 + eps) - f(x0 - eps)) / eps;
+                i = Math.sign(g);
+                x -= h * g;
+
+                g = (f(x) - f(x0)) / (x - x0);
+
+                x0 = x;
+
+                i1 = Math.sign(g);
+
+                if (Math.abs(g) < d) {
+                    return x;
+                } else {
+                    if (i1 != i) {
+                        h = h / 2.0;
+                    } else {
+                        h = h * 1.6;
+                    }
+
+                    i = i1;
+                }
+
+                iter++;
+            }
+        }
+
+
+
+        window.onload = function() {
+            var pointSolve = solve();
+            var result = draw();
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                zoomEnabled: true,
+                title: {
+                    text: "Методи одно та багатовимірної оптимізації"
+                },
+                axisY: {
+                    
+                    
+                    stripLines: [{
+                        value: 3366500,
+                        label: "Average"
+                    }]
+                },
+                data: [{
+                        showInLegend: true,
+                        yValueFormatString: "##.00mn",
+                        type: "spline",
+                        dataPoints: result
+                    },
+                    {
+                        showInLegend: true,
+                        yValueFormatString: "##.00mn",
+                        name: 'Bisection',
+                        type: "line",
+                        dataPoints: [pointSolve[0]]
+                    },
+                    {
+                        showInLegend: true,
+                        yValueFormatString: "##.00mn",
+                        name: 'Random',
+                        type: "line",
+                       
+                        dataPoints: [pointSolve[1]]
+                    },
+                    {
+                        showInLegend: true,
+                        yValueFormatString: "##.00mn",
+                        name: 'Gradient',
+                        type: "line",
+                        
+                        dataPoints: [pointSolve[2]]
+                    }
+                ]
+            });
+            chart.render();
+
+
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="chartContainer" style="height: 600px; width: 100%;">
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </div>
+</body>
+
+</html>

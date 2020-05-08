@@ -1,0 +1,10 @@
+var Arr = [1, 17,12,4,7,5,9,13,37,69];
+
+for (var i = 1; i < Arr.length; i++)
+    for (var j = 0; j < i; j++)
+        if (Arr[i] < Arr[j]) {
+            var x = Arr[i];
+            Arr[i] = Arr[j];
+            Arr[j] = x;
+        }
+console.log(Arr[0], Arr[1]);

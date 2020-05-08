@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+
+    <script>
+        var T = 2;
+        var MEAN = 0;
+        var VARIANCE = 0.5;
+
+
+        var oldMu, oldSigma;
+        var x2, multiplier, genReady;
+
+        function normal(mu, sigma) {
+
+            var x1, u1, u2, v1, v2, s;
+
+            if ('number' !== typeof mu) {
+                throw new TypeError('nextNormal: mu must be number.');
+            }
+            if ('number' !== typeof sigma) {
+                throw new TypeError('nextNormal: sigma must be number.');
+            }
+
+            if (mu !== oldMu || sigma !== oldSigma) {
+                genReady = false;
+                oldMu = mu;
+                oldSigma = sigma;
+            }
+
+            if (genReady) {
+                genReady = false;
+                return (sigma * x2) + mu;
+            }
+
+            u1 = Math.random();
+            u2 = Math.random();
+
+            v1 = (2 * u1) - 1;
+            v2 = (2 * u2) - 1;
+
+            s = (v1 * v1) + (v2 * v2);
+
+            if (s >= 1) {
+                return normal(mu, sigma);
+            }
+
+            multiplier = Math.sqrt(-2 * Math.log(s) / s);
+
+            x1 = v1 * multiplier;
+            x2 = v2 * multiplier;
+
+            genReady = true;
+
+            return (sigma * x1) + mu;
+        }
+
+
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        class Cluster {
+            constructor(points) {
+                this.points = points;
+            }
+        }
+
+        function distance(point1, point2) {
+            return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+        }
+
+        function generate_all_points(centers) {
+            var generate_list = [];
+            for (var center_point = 0; center_point < centers.length; center_point++) {
+                for (var i = 0; i < 40; i++) {
+                    var x = normal(MEAN, VARIANCE);
+                    var y = normal(MEAN, VARIANCE);
+                    generate_list.push(new Point(x + center_point_list[center_point].x, y + center_point_list[center_point].y));
+
+                }
+            }
+            return generate_list;
+        }
+
+        function clusterizate(generate_list) {
+            var cluster_list = [];
+            for (var i = 0; i < generate_list.length; i++) {
+                var current_point = generate_list[i];
+                var min_value = 20000;
+                var index = -1;
+                (function() {
+                    var cLength = cluster_list.length;
+                    for (var j = 0; j < cLength; j++) {
+                        console.log(cluster_list.length);
+                        var current_distance = distance(current_point, cluster_list[j].points[0]);
+                        if (current_distance < T) {
+                            if (current_distance < min_value) {
+                                min_value = current_distance;
+                                index = j;
+                            }
+
+                        }
+                    }
+                    if (index >= 0) {
+                        cluster_list[index].points.push(current_point);
+                    } else if (index < 0) {
+                        cluster_list.push(new Cluster([]));
+                        var temp = cluster_list[cluster_list.length - 1];
+                        temp.points.push(current_point);
+                    }
+                }());
+
+            }
+
+            return cluster_list;
+
+        }
+
+
+
+        center_point_list = [new Point(-1, 2), new Point(3, 1), new Point(3, 5), new Point(2, -1), new Point(4,-4)];
+
+        var all_points = generate_all_points(center_point_list, MEAN, VARIANCE);
+
+        clusters = clusterizate(all_points);
+        console.log(clusters);
+
+        var dataArray = [];
+        for (var i = 0; i < clusters.length; i++) {
+            var points = clusters[i].points;
+            var clasterColor = '#' + Math.random().toString(16).slice(2, 8).toUpperCase();
+
+            for (var j = 0; j < points.length; j++) {
+                dataArray.push({
+                    x: points[j].x,
+                    y: points[j].y,
+                    color: clasterColor
+                });
+
+            }
+
+        }
+
+
+        window.onload = function() {
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: false,
+                title: {
+                    text: "Clasters"
+                },
+                axisX: {
+                    title: "4 центральні точки"
+                },
+                axisY: {
+                    
+                },
+                legend: {
+                    cursor: "pointer",
+                    itemclick: toggleDataSeries
+                },
+                data: [{
+                    type: "scatter",
+                    name: "Кластери",
+                    showInLegend: true,
+                    toolTipContent: "<span style=\"color:#4F81BC \">{name}</span><br>Active Users: {x}<br>CPU Utilization: {y}%",
+                    dataPoints: dataArray
+                }]
+            });
+            chart.render();
+
+            function toggleDataSeries(e) {
+                if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                    e.dataSeries.visible = false;
+                } else {
+                    e.dataSeries.visible = true;
+                }
+                e.chart.render();
+            }
+
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="chartContainer" style="height: 600px; width: 100%;">
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script>
+        var YEARS = [1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014];
+        
+        var NUMBERS = [69128, 64487, 60654, 59029, 56659, 55532, 55018, 61741, 62182, 61441, 57706, 59736, 62421, 65009, 59491, 62336, 62367, 68200, 64803, 63755, 71360, 70362, 68981, 69070, 66217, 60436];
+        var p = 1;
+        var sourceArray = [];
+
+
+        function numSourceArray(YEARS, NUMBERS) {
+            for (var i = 0; i < NUMBERS.length; i++) {
+                var dataX = YEARS[i];
+                var dataY = NUMBERS[i];
+                sourceArray.push({
+                    label: i,
+                    y: dataY,
+                    x: dataX
+                });
+            }
+            return sourceArray;
+        }
+
+        function findCoef() {
+            var listCoef = [];
+            for (var i = 0.1; i < 1; i += 0.1) {
+                var temp1 = holt_brown_method(i, 1, 1)[1];
+                listCoef.push(temp1);
+            }
+            var alpha = listCoef.indexOf(Math.min(...listCoef)) / 10 + 0.1;
+
+            listCoef = [];
+            for (var i = 0.1; i < 1; i += 0.1) {
+                var temp2 = holt_brown_method(alpha, i, 1)[1];
+                listCoef.push(temp2);
+            }
+            var beta = listCoef.indexOf(Math.min(...listCoef)) / 10 + 0.1;
+
+            return [alpha, beta]
+        }
+
+        function holt_brown_method(alpha, beta, p) {
+            var listL = [NUMBERS[0]];
+            var listT = [0];
+            var newList = [];
+            var fault = 0;
+            var newListForFault = [];
+
+            for (var i = 1; i < NUMBERS.length; i++) {
+                
+                var dataX = YEARS[i];
+
+                listL.push(alpha * NUMBERS[i] + (1 - alpha) * (listL[i - 1] - listT[i - 1]));
+                listT.push(beta * (listL[i] - listL[i - 1]) + (1 - beta) * listT[i - 1]);
+
+                newListForFault.push(listL[i] + p * listT[i]);
+                newList.push({
+                    label: i,
+                    y: listL[i] + p * listT[i],
+                    x: dataX + 1
+                });
+                fault += Math.pow(NUMBERS[i - 1] - newListForFault[i - 1], 2);
+            }
+            fault = Math.pow(fault, 0.5);
+            //console.log("Fault = " + fault);
+
+            return [newList, fault];
+        }
+
+
+
+
+        window.onload = function() {
+            var result = holt_brown_method(findCoef()[0], findCoef()[1], 1);
+            var obj = document.getElementById("fault");
+            obj.value = result[1];
+            findCoef();
+            var source = numSourceArray(YEARS, NUMBERS);
+            console.log(result[1]);
+            var chart = new CanvasJS.Chart("chartContainer", {
+                theme: "light2",
+                animationEnabled: true,
+                title: {
+                    text: "Прогнозування часових послідовностей (Метод Хольта–Брауна)"
+
+                },
+                axisY: {
+                    includeZero: false
+                },
+                toolTip: {
+                    shared: "true"
+                },
+                legend: {
+                    cursor: "pointer",
+                    itemclick: toggleDataSeries
+                },
+                data: [{
+                        type: "spline",
+                        visible: true,
+                        showInLegend: true,
+                        yValueFormatString: "##.00mn",
+                        name: "Вхідні данні",
+                        dataPoints: source
+
+                    },
+                    {
+                        type: "spline",
+                        showInLegend: true,
+                        yValueFormatString: "##.00mn",
+                        name: "Прогнозування",
+                        dataPoints: result[0]
+                    }
+                ]
+            });
+            chart.render();
+
+            function toggleDataSeries(e) {
+                if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                    e.dataSeries.visible = false;
+                } else {
+                    e.dataSeries.visible = true;
+                }
+                chart.render();
+            }
+
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="chartContainer" style="height: 550px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    Похибка = <input id="fault">
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:['line','corechart']});
+      google.charts.setOnLoadCallback(drawChart1);      
+        
+     
+        var data;
+        var exp = 2.71;
+        
+        
+    function F1(x){
+        return Math.sin(x)*Math.pow(exp,-Math.abs(x));
+    }
+        
+    
+            
+            
+        
+
+    function drawChart1() {
+     data = new google.visualization.DataTable();
+       
+        var i = 0;
+        
+        data.addColumn('number', 'X');
+        data.addColumn('number', 'Y');
+        
+        
+        for (var x = -5; x < 5; x += 0.1, i++)
+            {
+                var y = F1(x); 
+                data.addRow([x, y]);
+            }
+
+       var options1 = {
+        chart: {
+          title: 'Табуляція, Івано-Франківська область'
+          
+        },
+        width: 900,
+        height: 500,
+        axes: {
+          x: {
+            0: {side: 'top'}
+          }
+        }
+      };
+
+    var lineChart = new google.charts.Line(document.getElementById('line_top_x'));
+        lineChart.draw(data, options1);
+    }
+  </script>
+</head>
+<body>
+  <div id="line_top_x"></div>
+  <div id="line_top_temp"></div>
+</body>
+</html>

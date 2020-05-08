@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Рік', 'Населення'],
+            ['1989',	423500],
+            ['1990',	431400],
+            ['1991',	442900],
+            ['1992',	451500],
+            ['1993',	461000],
+            ['1994',	465600],
+            ['1995',	466800],
+            ['1996',	462300],
+            ['1997',	455400],
+            ['1998',	448200],
+            ['1999',	439600],
+            ['2000',	430100],
+            ['2001',	420200],
+            ['2002',	409760],
+            ['2003',	403659],
+            ['2004',	397822],
+            ['2005',	393616],
+            ['2006',	388947],
+            ['2007',	385372],
+            ['2008',	382603],
+            ['2009',	381062],
+            ['2010',	380716],
+            ['2011',	379766],
+            ['2012',	380128],
+            ['2013',	381788],
+            ['2014',	382096],
+          
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Населення Івано-Франківської області',
+            subtitle: 'Період з: 1989-2014',
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+  </head>
+  <body>
+    <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+  </body>
+</html>

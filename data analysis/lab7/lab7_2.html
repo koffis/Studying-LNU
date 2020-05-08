@@ -1,0 +1,62 @@
+  <html>
+
+  <head>
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+      <script type="text/javascript">
+          google.charts.load('current', {
+              'packages': ['line']
+          });
+          google.charts.setOnLoadCallback(drawChart);
+
+          var sourceArray = [27450, 26406, 24732, 24937, 24372, 23990, 24003, 25269, 24818, 24068, 22703, 22173, 22417, 22541, 21958, 22902, 23469, 25428, 25493, 28769, 31877, 28708, 26541, 26870, 24642, 24243];
+          
+          function drawChart() {
+              var data = new google.visualization.DataTable();
+              data.addColumn('number', 'X');
+              data.addColumn('number', 'Source');
+              data.addColumn('number', '7.1');
+              data.addColumn('number', '7.2');
+              data.addColumn('number', '7.3');
+              
+              data.addRow([0,sourceArray[0], sourceArray[0], sourceArray[0], sourceArray[0]]);
+
+              for (var i = 1; i < sourceArray.length; i++) {
+                  var v4 = sourceArray[i];
+                  var v1 = sourceArray[i - 1];
+                  var v2 = sourceArray[i - 1] + (sourceArray[i - 1] - sourceArray[i - 2]);
+                  var v3 = sourceArray[i - 1] * sourceArray[i - 1] / sourceArray[i - 2];
+                  
+
+                  data.addRow([i, v4,v1, v2, v3]);
+
+              }
+
+              var options = {
+                  chart: {
+                      title: 'Методи первісних обробок даних'
+
+                  },
+                  width: 900,
+                  height: 500,
+                  axes: {
+                      x: {
+                          0: {
+                              side: 'top'
+                          }
+                      }
+                  }
+              };
+
+              var chart = new google.charts.Line(document.getElementById('line_top_x'));
+
+              chart.draw(data, google.charts.Line.convertOptions(options));
+          }
+
+      </script>
+  </head>
+
+  <body>
+      <div id="line_top_x"></div>
+  </body>
+
+  </html>

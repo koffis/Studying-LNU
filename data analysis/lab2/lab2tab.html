@@ -1,0 +1,83 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['line']});
+      google.charts.setOnLoadCallback(drawChart);
+      
+        
+        var x0 = 0;
+        var xn = 10;
+        var step = 0.1;
+        var xArr = [];
+        var yArr = [];
+        var yrArr = [];
+        var data;
+        var alpha = 0.1;
+        
+    function Fr(x){
+        return Math.pow(Math.sin(0.1 * x),2 ) + Math.sin(x) + Math.random() / 2;
+    }
+       
+    
+    function F(x) {
+         return Math.pow(Math.sin(0.1 * x),2 ) + Math.sin(x);
+    }
+        
+        function ExponentialAverage() {
+            var newExp = new Array(yrArr.length);
+            newExp[0] = yrArr[0];
+            
+            for (var i = 1; i < yrArr.length; i++) {
+                newExp[i] = newExp[i-1] + alpha * (yrArr[i] - newExp[i-1]);
+            }
+            
+            return newExp;
+            
+        }
+        
+
+    function drawChart() {
+     data = new google.visualization.DataTable();
+        var i = 0;
+        data.addColumn('number', 'X');
+        data.addColumn('number', 'Without random');
+        data.addColumn('number', 'With random');
+        data.addColumn('number', 'Exponential average');
+        
+        for (var x = x0; x < xn; x += step, i++)
+            {
+                xArr[i] = x;
+                yArr[i] = F(x);
+                yrArr[i] = Fr(x);
+            }
+        var ea = ExponentialAverage();
+        for (var i = 0; i < yArr.length; i++){
+            data.addRow([xArr[i], yArr[i], yrArr[i], ea[i]]);
+            
+        }
+        
+      var options = {
+        chart: {
+          title: 'Методи первісних обробок даних'
+          
+        },
+        width: 900,
+        height: 500,
+        axes: {
+          x: {
+            0: {side: 'top'}
+          }
+        }
+      };
+
+      var chart = new google.charts.Line(document.getElementById('line_top_x'));
+
+      chart.draw(data, google.charts.Line.convertOptions(options));
+    }
+  </script>
+</head>
+<body>
+  <div id="line_top_x"></div>
+</body>
+</html>
