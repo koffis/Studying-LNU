@@ -1,0 +1,60 @@
+<p>Open console to see result( F12 or Ctrl+Shift+J )</p>
+
+<script>
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+class Point3 {
+    constructor(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+
+function printPoint(p){
+    console.log(p.x + "\t" + p.y + "\t" + p.z);
+}
+
+function indexOf(list, x){
+    for(var i = 0; i < list.length; i++){
+        if(list[i].x == x)
+            return i;
+    }
+    return -1;
+}
+
+var points = [new Point(2, 0.04), new Point(3, 0.15), new Point(7, 0.2),new Point(12, 0.25), new Point(19, 0.2), new Point(23, 0.15), new Point(30, 0.01)];
+
+var intervals = [];
+var randomValues = [];
+var frequency = [];
+var x0 = 0, x1 = 0;
+for(var i = 0; i < points.length; i++){
+    x0 = x1;
+    x1 = x0 + points[i].y;
+    intervals.push(new Point3(x0, x1, points[i].x));
+    frequency.push(0);
+}
+
+for(var i = 0; i < 100; i++){
+    var value = Math.random();
+    randomValues.push(value);
+    
+    for(var j = 0; j < intervals.length; j++){
+        var currentInterval = intervals[j];
+        
+        if(value >= currentInterval.x && value < currentInterval.y){
+            console.log(value.toFixed(4) + " : \t" + currentInterval.z);
+            frequency[indexOf(points, currentInterval.z)] += 1;
+        }
+    }
+}
+
+console.log("Frequencies");
+for(var i = 0; i < points.length; i++)
+    console.log(points[i].x + " :\t" + frequency[i]);
+</script>
